@@ -10,6 +10,7 @@ from pathlib import Path
 from bs4 import BeautifulSoup
 
 dbg = False
+simpleNames = True
 
 limit = 10
 
@@ -19,38 +20,43 @@ cashedMd5 = {}
 timeStamps = {}
 toGetLinks = []
 BigUrl = str()
+originalUrl = str()
 key = 0
 i = 0
 
 ##### Filestorage and the like
 def properFileName(fname):
     fn = str(fname)
-    if 'http://' in fn:
-        fn = fn.lstrip('http://')
-    if 'https://' in fn:
-        fn = fn.lstrip('https://')
-    if 'www.' in fn:
-        fn = fn.lstrip('www.')
+    if simpleNames:
+        return originalUrl
 
+    else:
+        if 'http://' in fn:
+            fn = fn.lstrip('http://')
+        if 'https://' in fn:
+            fn = fn.lstrip('https://')
+        if 'www.' in fn:
+            fn = fn.lstrip('www.')
 
-    fn = fn.split('/')
-    FN = fn[0] + '_'
-    fn[0] = ''
-    FN += ''.join(x.capitalize() for x in fn)
-    print(FN)
-    return FN
+        fn = fn.split('/')
+        FN = fn[0] + '_'
+        fn[0] = ''
+        FN += ''.join(x.capitalize() for x in fn)
+        print(FN)
+        return FN
 
-
-def saveData(fname, data):
+def saveData(fname, data, NUM):
     pathName = str(os.path.dirname(os.path.realpath(__file__)))
     toDir = '/pages'
-    fDes = '.data'
+    fDes = '.pg'
 
     fullDir = pathName + toDir
 
     fn = properFileName(fname)
 
     fullFileName = fullDir + '/' + fn
+    if simpleNames:
+        fullFileName += '_' + str(NUM)
     print(fullFileName)
     if not os.path.exists(fullDir): #Make Sure Dir exists. If not, builds dir
         os.makedirs(fullDir)
@@ -61,7 +67,7 @@ def saveData(fname, data):
         fileExists = True
         while fileExists:
             tmp = fullFileName + '_' + str(i)
-            fm = Path(str(tmp) + '.data')
+            fm = Path(str(tmp) + fDes)
             if not fm.is_file():
                 fullFileName = tmp
                 fileExists = False
@@ -182,6 +188,7 @@ if len(sys.argv) < 2:
 #    What Actually Executes
 #################################################################
 url = str(sys.argv[1])
+originalUrl = url
 breadth = int(sys.argv[2])
 print('Url: {u}\nBreadth: {b}\n'.format(u = url, b = breadth))
 
@@ -210,4 +217,4 @@ for j in cashedMd5:
 for i in range(0,len(cashedLinks)):
     tmpData = makeData(i)
     print('Made Data')
-    saveData(cashedLinks[i], tmpData)
+    saveData(cashedLinks[i], tmpData, i)
