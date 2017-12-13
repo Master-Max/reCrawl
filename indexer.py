@@ -80,7 +80,6 @@ bigList = {}
 for i in range(0,len(toIndex)):
     titleTerms = []
     bodyTerms = []
-    lilList = {}
     with open(toIndex[i]) as inFile:
         soup = BeautifulSoup(inFile, 'lxml')
 
